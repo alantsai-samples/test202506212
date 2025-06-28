@@ -1,9 +1,9 @@
-name: Deploy to Azure Function
+name: Deploy Azure Function (Flex Consumption)
 
 on:
   push:
     branches:
-      - python3-crawler-azure-function  # 或你實際用的 branch
+      - python3-crawler-azure-function
 
 jobs:
   build-and-deploy:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
@@ -23,9 +23,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Deploy to Azure Functions
-      uses: Azure/functions-action@v1
+    - name: Azure Login
+      uses: azure/login@v1
       with:
-        app-name: test20250628      # ⚠️ 改成你的 Azure Function 名稱
-        package: .                            # 根目錄就是 function app
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to Azure Functions
+      run: |
+        az functionapp deployment source config-zip \
+          --resource-group test \
+          --name test20250628 \
+          --src ./function.zip
+      env:
+        ZIP_FILE: function.zip
+
+    - name: Package Function App
+      run: |
+        zip -r function.zip * -x '*.git*' '*.github*'
