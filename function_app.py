@@ -10,8 +10,20 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 def CrawlerToJson(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
     try:
-        url = "https://quotes.toscrape.com/"
-        res = requests.get(url)
+        # 取得 URL 參數，若無則使用預設網址
+        url = req.params.get('url')
+        if not url:
+            try:
+                req_body = req.get_json()
+            except ValueError:
+                req_body = None
+
+            if req_body and 'url' in req_body:
+                url = req_body['url']
+
+        if not url:
+            url = "https://quotes.toscrape.com/"
+            
         res.raise_for_status()
 
         soup = BeautifulSoup(res.text, "html.parser")
