@@ -31,10 +31,9 @@ jobs:
     - name: Package function app
       run: |
         mkdir build
-        cp -r * build/
+        rsync -av --exclude=build --exclude=.git --exclude=.github ./ build/
         cd build
-        zip -r ../function.zip . -x '*.git*' '*.github*' '*function.zip*'
-      shell: bash
+        zip -r ../function.zip .
 
     - name: Deploy to Azure Functions
       run: |
