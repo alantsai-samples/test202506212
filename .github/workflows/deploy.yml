@@ -28,6 +28,14 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Package function app
+      run: |
+        mkdir build
+        cp -r * build/
+        cd build
+        zip -r ../function.zip . -x '*.git*' '*.github*' '*function.zip*'
+      shell: bash
+
     - name: Deploy to Azure Functions
       run: |
         az functionapp deployment source config-zip \
@@ -36,7 +44,3 @@ jobs:
           --src ./function.zip
       env:
         ZIP_FILE: function.zip
-
-    - name: Package Function App
-      run: |
-        zip -r function.zip * -x '*.git*' '*.github*'
