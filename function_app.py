@@ -23,7 +23,8 @@ def CrawlerToJson(req: func.HttpRequest) -> func.HttpResponse:
 
         if not url:
             url = "https://quotes.toscrape.com/"
-            
+
+        res = requests.get(url)   
         res.raise_for_status()
 
         soup = BeautifulSoup(res.text, "html.parser")
